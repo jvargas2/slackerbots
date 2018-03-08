@@ -1,0 +1,11 @@
+# macOS
+.DS_Store
+
+# VSCodre
+.vscode
+
+# Python
+venv/
+
+# SQLite
+*.sqlite3
