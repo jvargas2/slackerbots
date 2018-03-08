@@ -18,6 +18,7 @@ chatbot = ChatBot(
 )
 
 learn_list = []
+last_message_ts = time.time()
 
 # constants
 RTM_READ_DELAY = 1 # 1 second delay between reading from RTM
@@ -33,8 +34,8 @@ def parse_bot_commands(slack_events):
     for event in slack_events:
         if event["type"] == "message" and not "subtype" in event:
             message = parse_mention(event["text"])
-            return message, event["channel"]
-    return None, None
+            return message, event["channel"], event
+    return None, None, None
 
 def parse_mention(message_text):
     if "am" in message_text.lower():
@@ -63,7 +64,6 @@ def handle_command(command, channel):
     #     response = "Sure...write some more code then I can do that!"
 
     response = chatbot.get_response(command)
-    learn(command)
 
     # Sends the response back to the channel
     slack_client.api_call(
@@ -72,12 +72,18 @@ def handle_command(command, channel):
         text=response or default_response
     )
 
-def learn(message):
+def learn(event):
     global learn_list
-    learn_list.append(message)
-    if len(learn_list) >= 5:
+    global last_message_ts
+    message = event['text']
+    ts = event['ts']
+    time_since_last_message = ts - last_message_ts
+    if time_since_last_message >= (12 * 60 * 60):
         chatbot.train(learn_list)
+        print(learn_list)
+        print('Trained list!')
         learn_list = []
+    learn_list.append(message)
     print(learn_list)
 
 if __name__ == "__main__":
@@ -86,9 +92,11 @@ if __name__ == "__main__":
         # Read bot's user ID by calling Web API method `auth.test`
         starterbot_id = slack_client.api_call("auth.test")["user_id"]
         while True:
-            command, channel = parse_bot_commands(slack_client.rtm_read())
+            command, channel, event = parse_bot_commands(slack_client.rtm_read())
             if command:
                 handle_command(command, channel)
+            if event:
+                learn(event)
             time.sleep(RTM_READ_DELAY)
     else:
         print("Connection failed. Exception traceback printed above.")
