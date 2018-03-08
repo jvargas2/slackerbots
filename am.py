@@ -12,10 +12,12 @@ starterbot_id = None
 
 chatbot = ChatBot(
     'AM',
-    trainer='chatterbot.trainers.ChatterBotCorpusTrainer',
+    trainer='chatterbot.trainers.ListTrainer',
     storage_adapter='chatterbot.storage.SQLStorageAdapter',
     database='./am.sqlite3'
 )
+
+learn_list = []
 
 # constants
 RTM_READ_DELAY = 1 # 1 second delay between reading from RTM
@@ -61,6 +63,7 @@ def handle_command(command, channel):
     #     response = "Sure...write some more code then I can do that!"
 
     response = chatbot.get_response(command)
+    learn(command)
 
     # Sends the response back to the channel
     slack_client.api_call(
@@ -68,6 +71,14 @@ def handle_command(command, channel):
         channel=channel,
         text=response or default_response
     )
+
+def learn(message):
+    global learn_list
+    learn_list.append(message)
+    if len(learn_list) >= 5:
+        chatbot.train(learn_list)
+        learn_list = []
+    print(learn_list)
 
 if __name__ == "__main__":
     if slack_client.rtm_connect(with_team_state=False):
