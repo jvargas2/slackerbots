@@ -37,7 +37,7 @@ def parse_bot_commands(slack_events):
     return None, None
 
 def parse_mention(message_text):
-    if "am" in message_text:
+    if "am" in message_text.lower():
         return message_text
 
 def parse_direct_mention(message_text):
