@@ -76,7 +76,7 @@ def learn(event):
     global learn_list
     global last_message_ts
     message = event['text']
-    ts = event['ts']
+    ts = float(event['ts'])
     time_since_last_message = ts - last_message_ts
     if time_since_last_message >= (12 * 60 * 60):
         chatbot.train(learn_list)
