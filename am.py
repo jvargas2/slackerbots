@@ -38,7 +38,9 @@ def parse_bot_commands(slack_events):
     return None, None, None
 
 def parse_mention(message_text):
-    if "am" in message_text.lower():
+    starterbot_id = slack_client.api_call("auth.test")["user_id"]
+    lower_text = message_text.lower()
+    if "am" in lower_text or starterbot_id in lower_text:
         return message_text
 
 def parse_direct_mention(message_text):
