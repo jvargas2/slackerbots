@@ -87,6 +87,7 @@ def learn(event):
         learn_list = []
     learn_list.append(message)
     print(learn_list)
+    last_message_ts = ts
 
 if __name__ == "__main__":
     if slack_client.rtm_connect(with_team_state=False):
