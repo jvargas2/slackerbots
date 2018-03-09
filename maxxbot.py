@@ -10,12 +10,15 @@ slack_client = SlackClient(os.environ.get('MAXXBOT_TOKEN'))
 # starterbot's user ID in Slack: value is assigned after the bot starts up
 starterbot_id = None
 
-chatbot = ChatBot(
+chatbot = ChatBot(    
     'Maxxbot',
-    trainer='chatterbot.trainers.ChatterBotCorpusTrainer',
+    trainer='chatterbot.trainers.ListTrainer',
     storage_adapter='chatterbot.storage.SQLStorageAdapter',
     database='./maxxbot.sqlite3'
 )
+
+learn_list = []
+last_message_ts = time.time()
 
 # constants
 RTM_READ_DELAY = 1 # 1 second delay between reading from RTM
@@ -30,10 +33,15 @@ def parse_bot_commands(slack_events):
     """
     for event in slack_events:
         if event["type"] == "message" and not "subtype" in event:
-            user_id, message = parse_direct_mention(event["text"])
-            if user_id == starterbot_id:
-                return message, event["channel"]
-    return None, None
+            message = parse_mention(event["text"])
+            return message, event["channel"], event
+    return None, None, None
+
+def parse_mention(message_text):
+    starterbot_id = slack_client.api_call("auth.test")["user_id"].lower()
+    lower_text = message_text.lower()
+    if "maxxbot" in lower_text or starterbot_id in lower_text:
+        return message_text
 
 def parse_direct_mention(message_text):
     """
@@ -66,15 +74,31 @@ def handle_command(command, channel):
         text=response or default_response
     )
 
+def learn(event):
+    global learn_list
+    global last_message_ts
+    message = event['text']
+    ts = float(event['ts'])
+    time_since_last_message = ts - last_message_ts
+    if time_since_last_message >= (60 * 60):
+        chatbot.train(learn_list)
+        print(learn_list)
+        print('Trained list!')
+        learn_list = []
+    learn_list.append(message)
+    print(learn_list)
+
 if __name__ == "__main__":
     if slack_client.rtm_connect(with_team_state=False):
-        print("Starter Bot connected and running!")
+        print("Maxxbot connected and running!")
         # Read bot's user ID by calling Web API method `auth.test`
         starterbot_id = slack_client.api_call("auth.test")["user_id"]
         while True:
-            command, channel = parse_bot_commands(slack_client.rtm_read())
+            command, channel, event = parse_bot_commands(slack_client.rtm_read())
             if command:
                 handle_command(command, channel)
+            if event:
+                learn(event)
             time.sleep(RTM_READ_DELAY)
     else:
         print("Connection failed. Exception traceback printed above.")
