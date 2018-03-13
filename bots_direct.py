@@ -14,7 +14,7 @@ am = ChatBot(
     database='./am.sqlite3'
 )
 
-chatbot = am
+chatbot = maxxbot
 
 # Train based on the english corpus
 # chatbot.train("chatterbot.corpus.english")
@@ -22,7 +22,7 @@ chatbot = am
 # Get a response to an input statement
 # chatbot.get_response("Hello, how are you today?")
 
-learn_list = []
+# learn_list = []
 
 # def learn(message):
 #     global learn_list
@@ -35,6 +35,6 @@ learn_list = []
 # for c in learn_list:
     # chatbot.train(c)
 
-# while True:
-#     m = input("> ")
-#     print(chatbot.get_response(m))
+while True:
+    m = input("> ")
+    print(chatbot.get_response(m))

@@ -1,7 +1,7 @@
 # macOS
 .DS_Store
 
-# VSCodre
+# VSCode
 .vscode
 
 # Python
@@ -9,3 +9,7 @@ venv/
 
 # SQLite
 *.sqlite3
+
+# Project
+slack_exports
+slack_training_data.csv
