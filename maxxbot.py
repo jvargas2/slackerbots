@@ -65,7 +65,10 @@ def handle_command(command, channel):
     # if command.startswith(EXAMPLE_COMMAND):
     #     response = "Sure...write some more code then I can do that!"
 
-    response = chatbot.get_response(command)
+    if 'point' in command or 'rank' in command:
+        response = ranks()
+    else:
+        response = chatbot.get_response(command)
 
     # Sends the response back to the channel
     slack_client.api_call(
@@ -88,6 +91,20 @@ def learn(event):
     learn_list.append(message)
     print(learn_list)
     last_message_ts = ts
+
+def ranks():
+    data = requests.get('https://bracketchallenge.ncaa.com/api/static-v1/ncaabracketchallenge/group/730609/show.json').json()
+    entries = data['entries']
+    ranks = "```"
+
+    for entry in entries:
+        name = entry['name']
+        points = entry['total_points']
+        rank = entry['rank']
+        ranks += "%s: Rank %d (%d points)\n" % (name, rank, points)
+
+    ranks += "```"
+    return ranks
 
 if __name__ == "__main__":
     if slack_client.rtm_connect(with_team_state=False):
