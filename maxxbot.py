@@ -1,6 +1,7 @@
 import os
 import time
 import re
+import requests
 from slackclient import SlackClient
 from chatterbot import ChatBot
 
