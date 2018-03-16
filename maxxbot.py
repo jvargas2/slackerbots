@@ -40,7 +40,7 @@ def parse_bot_commands(slack_events):
 def parse_mention(message_text):
     starterbot_id = slack_client.api_call("auth.test")["user_id"].lower()
     lower_text = message_text.lower()
-    if "maxxbot" in lower_text or starterbot_id in lower_text or 'point' in command or 'rank' in command:
+    if "maxxbot" in lower_text or starterbot_id in lower_text or 'point' in lower_text or 'rank' in lower_text:
         return message_text
 
 def parse_direct_mention(message_text):
