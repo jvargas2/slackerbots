@@ -101,8 +101,9 @@ def ranks():
     for entry in entries:
         name = entry['name']
         points = entry['total_points']
+        possible_points = entry['possible_points_remaining']
         rank = entry['rank']
-        ranks += "%s: Rank %d (%d points)\n" % (name, rank, points)
+        ranks += "%s: Rank %d (%d points, remaining: %d)\n" % (name, rank, points, possible_points)
 
     ranks += "```"
     return ranks
