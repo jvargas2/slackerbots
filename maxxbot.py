@@ -103,7 +103,7 @@ def ranks():
         points = entry['total_points']
         possible_points = entry['possible_points_remaining']
         rank = entry['rank']
-        ranks += "%s: Rank %d (%d points, remaining: %d)\n" % (name, rank, points, possible_points)
+        ranks += "%s: %d - %d (%d left)\n" % (name, rank, points, possible_points)
 
     ranks += "```"
     return ranks
