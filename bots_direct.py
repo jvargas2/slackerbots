@@ -1,12 +1,5 @@
 from chatterbot import ChatBot
 
-maxxbot = ChatBot(
-    'Maxxbot',
-    trainer='chatterbot.trainers.ChatterBotCorpusTrainer',
-    storage_adapter='chatterbot.storage.SQLStorageAdapter',
-    database='./maxxbot.sqlite3'
-)
-
 am = ChatBot(
     'AM',
     trainer='chatterbot.trainers.ListTrainer',
@@ -14,7 +7,9 @@ am = ChatBot(
     database='./am.sqlite3'
 )
 
-chatbot = maxxbot
+chatbot = am
+
+l = []
 
 # Train based on the english corpus
 # chatbot.train("chatterbot.corpus.english")
@@ -35,6 +30,27 @@ chatbot = maxxbot
 # for c in learn_list:
     # chatbot.train(c)
 
-while True:
-    m = input("> ")
-    print(chatbot.get_response(m))
+mode = 0
+
+while mode <= 0:
+    inp = int(input("Which mode? (1 - train, 2 - talk)\n> "))
+    if inp <= 0:
+        print('Wrong input. Please try again.')
+    else:
+        mode = inp
+
+if mode == 1:
+    print("Started training mode.")
+    print("Will train the following list: ")
+    print(l)
+    print('Proceed? (y/n)')
+    if input("> ") == 'y':
+        chatbot.train(l)
+    else:
+        print('Cancelling...')
+
+elif mode == 2:
+    print("Started direct conversation mode.")
+    while True:
+        message = input("> ")
+        print(chatbot.get_response(message))
